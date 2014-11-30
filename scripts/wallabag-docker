@@ -8,7 +8,7 @@ DBPATH="$(dirname `readlink -m $0`)/../data"     # Or replace by absolute path t
 # Uncomment and specify to use your own wallabag SALT value in config file
 SALT='34gAogagAigJaurgbqfdvqQergvqer'            # No space in this string please
 
-IMAGENAME='bobmaerten/docker-wallabag:latest'
+IMAGENAME='laem/wallabag:latest'
 
 WALLABAGSOURCE='wallabag-source'
 WALLABAGDB='wallabag-db'
@@ -42,8 +42,10 @@ function getStatus(){
 
 case "$1" in
     start)
+        INSTALLNEEDED=false
         if [ ! -f $DBPATH/poche.sqlite ] ; then
-            setup
+          INSTALLNEEDED=true
+          setup
         fi
 
         VOLUMES=''
@@ -67,6 +69,9 @@ case "$1" in
         sudo docker ps -a | grep -v Exit | grep -q $WALLABAG
         if [ $? -ne 0 ]; then
             CONTAINER_ID=$(sudo docker run $WALLABAG_ENV -d --name $WALLABAG $VOLUMES -p=8080:80 $IMAGENAME /sbin/my_init --enable-insecure-key)
+        fi
+        if [ ! $INSTALLNEEDED ] ; then
+          sudo docker exec rm -rf $CONTAINER_ID:/var/www/wallabag/install
         fi
         getStatus
         ;;
