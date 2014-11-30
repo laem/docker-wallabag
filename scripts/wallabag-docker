@@ -19,8 +19,8 @@ function setup() {
     echo "#Exporting db from the container to host, in $DBPATH"
     ID=$(sudo docker run -d $IMAGENAME /sbin/my_init --skip-startup-files --quiet)
     sudo docker cp $ID:/var/www/wallabag/db/poche.sqlite $DBPATH
-    sudo chown -R $USER:$USER $DBPATH
-    sudo chmod -R 777 $DBPATH
+    sudo chown -R www-data:www-data $DBPATH
+    sudo chmod -R 775 $DBPATH
     ID=$(sudo docker stop $ID)
     ID=$(sudo docker rm $ID)
 }
