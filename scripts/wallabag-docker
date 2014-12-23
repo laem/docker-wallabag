@@ -43,8 +43,10 @@ function getStatus(){
 case "$1" in
     start)
         INSTALLNEEDED=false
+echo $INSTALLNEEDED
         if [ ! -f $DBPATH/poche.sqlite ] ; then
           INSTALLNEEDED=true
+echo $INSTALLNEEDED
           setup
         fi
 
@@ -70,8 +72,10 @@ case "$1" in
         if [ $? -ne 0 ]; then
             CONTAINER_ID=$(sudo docker run $WALLABAG_ENV -d --name $WALLABAG $VOLUMES -p=8080:80 $IMAGENAME /sbin/my_init --enable-insecure-key)
         fi
-        if [ ! $INSTALLNEEDED ] ; then
-          sudo docker exec rm -rf $CONTAINER_ID:/var/www/wallabag/install
+        if [ "$INSTALLNEEDED" = false ] ; then
+echo "will remove"
+          sudo docker exec -d $CONTAINER_ID rm -rf /var/www/wallabag/install
+echo $INSTALLNEEDED
         fi
         getStatus
         ;;
